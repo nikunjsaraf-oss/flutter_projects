@@ -73,7 +73,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
         onTap: () => onTapHandler(value),
         child: Container(
           height: MediaQuery.of(context).size.height * 0.1,
-          width: value == 'AC' ? 170 : 75,
+          width: value == 'AC' ? 270 : 75,
           decoration: BoxDecoration(
             color: Theme.of(context).buttonColor,
             borderRadius: BorderRadius.circular(12),
@@ -145,9 +145,6 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                       children: [
                         customButton(
                           'AC',
-                        ),
-                        customButton(
-                          '%',
                         ),
                         customButton(
                           '÷',
