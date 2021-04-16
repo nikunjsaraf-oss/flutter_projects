@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:math_expressions/math_expressions.dart';
 
 class CalculatorScreen extends StatefulWidget {
   @override
@@ -6,8 +7,92 @@ class CalculatorScreen extends StatefulWidget {
 }
 
 class _CalculatorScreenState extends State<CalculatorScreen> {
+  String equation = "0";
+  String result = "0";
+  String expression = "";
+  double equationFontSize = 38.0;
+  double resultFontSize = 48.0;
+
   static const int operatorColor = 0xFFE77575;
   static const int specialOperatorColor = 0xFF279B8A;
+  static const int numberColor = 0xFF8F9195;
+
+  void onTapHandler(String buttonValue) {
+    setState(() {
+      if (buttonValue == "AC") {
+        equation = "0";
+        result = "0";
+        equationFontSize = 38.0;
+        resultFontSize = 48.0;
+      } else if (buttonValue == "=") {
+        equationFontSize = 38.0;
+        resultFontSize = 48.0;
+
+        expression = equation;
+        expression = expression.replaceAll('x', '*');
+        expression = expression.replaceAll('÷', '/');
+
+        try {
+          Parser p = Parser();
+          Expression exp = p.parse(expression);
+
+          ContextModel cm = ContextModel();
+          result = '${exp.evaluate(EvaluationType.REAL, cm)}';
+        } catch (e) {
+          result = "Error";
+        }
+      } else {
+        equationFontSize = 48.0;
+        resultFontSize = 38.0;
+        if (equation == "0") {
+          equation = buttonValue;
+        } else {
+          equation = equation + buttonValue;
+        }
+      }
+    });
+  }
+
+  Widget customButton(String value) {
+    int buttonColor;
+    if (value == 'AC' || value == '+/-' || value == "%") {
+      buttonColor = specialOperatorColor;
+    } else if (value == '÷' ||
+        value == 'x' ||
+        value == '+' ||
+        value == '-' ||
+        value == '=') {
+      buttonColor = operatorColor;
+    } else {
+      buttonColor = numberColor;
+    }
+
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: GestureDetector(
+        onTap: () => onTapHandler(value),
+        child: Container(
+          height: MediaQuery.of(context).size.height * 0.1,
+          width: value == 'AC' ? 170 : 75,
+          decoration: BoxDecoration(
+            color: Theme.of(context).buttonColor,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Center(
+            child: Text(
+              value,
+              style: TextStyle(
+                fontFamily: 'Roboto',
+                fontSize: 25,
+                fontWeight: FontWeight.bold,
+                color: Color(buttonColor),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,27 +100,25 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
       child: Scaffold(
         body: Column(
           children: [
-            Expanded(
-              child: Container(
-                alignment: Alignment.centerRight,
-                padding: EdgeInsets.fromLTRB(10, 50, 10, 0),
-                child: Text(
-                  '308 x 42',
-                  style: TextStyle(fontSize: 24, fontFamily: 'Roboto'),
-                ),
+            SizedBox(height: 100),
+            Container(
+              alignment: Alignment.centerRight,
+              padding: EdgeInsets.fromLTRB(10, 20, 10, 0),
+              child: Text(
+                equation,
+                style:
+                    TextStyle(fontSize: equationFontSize, fontFamily: 'Roboto'),
               ),
             ),
-            Expanded(
-              child: Container(
-                alignment: Alignment.centerRight,
-                padding: EdgeInsets.fromLTRB(10, 30, 10, 0),
-                child: Text(
-                  '12,936',
-                  style: TextStyle(
-                    fontFamily: 'Roboto',
-                    fontSize: 48,
-                    fontWeight: FontWeight.bold,
-                  ),
+            Container(
+              alignment: Alignment.centerRight,
+              padding: EdgeInsets.fromLTRB(10, 00, 10, 0),
+              child: Text(
+                result,
+                style: TextStyle(
+                  fontFamily: 'Roboto',
+                  fontSize: resultFontSize,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
@@ -60,69 +143,58 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        CustomButton(
-                          value: 'AC',
-                          colorValue: specialOperatorColor,
+                        customButton(
+                          'AC',
                         ),
-                        CustomButton(
-                          value: '+/-',
-                          colorValue: specialOperatorColor,
+                        customButton(
+                          '%',
                         ),
-                        CustomButton(
-                          value: '%',
-                          colorValue: specialOperatorColor,
-                        ),
-                        CustomButton(
-                          value: '÷',
-                          colorValue: operatorColor,
+                        customButton(
+                          '÷',
                         ),
                       ],
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        CustomButton(value: '7'),
-                        CustomButton(value: '8'),
-                        CustomButton(value: '9'),
-                        CustomButton(
-                          value: 'x',
-                          colorValue: operatorColor,
+                        customButton('7'),
+                        customButton('8'),
+                        customButton('9'),
+                        customButton(
+                          'x',
                         ),
                       ],
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        CustomButton(value: '4'),
-                        CustomButton(value: '5'),
-                        CustomButton(value: '6'),
-                        CustomButton(
-                          value: '-',
-                          colorValue: operatorColor,
+                        customButton('4'),
+                        customButton('5'),
+                        customButton('6'),
+                        customButton(
+                          '-',
                         ),
                       ],
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        CustomButton(value: '1'),
-                        CustomButton(value: '2'),
-                        CustomButton(value: '3'),
-                        CustomButton(
-                          value: '+',
-                          colorValue: operatorColor,
+                        customButton('1'),
+                        customButton('2'),
+                        customButton('3'),
+                        customButton(
+                          '+',
                         ),
                       ],
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        CustomButton(value: '0'),
-                        CustomButton(value: '00'),
-                        CustomButton(value: '.'),
-                        CustomButton(
-                          value: '=',
-                          colorValue: operatorColor,
+                        customButton('0'),
+                        customButton('00'),
+                        customButton('.'),
+                        customButton(
+                          '=',
                         ),
                       ],
                     ),
@@ -131,46 +203,6 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class CustomButton extends StatelessWidget {
-  const CustomButton({
-    @required this.value,
-    this.colorValue = 0xFFC5C6C9,
-    Key key,
-  }) : super(key: key);
-
-  final String value;
-  final int colorValue;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: GestureDetector(
-        onTap: () {},
-        child: Container(
-          height: MediaQuery.of(context).size.height * 0.1,
-          width: 75,
-          decoration: BoxDecoration(
-            color: Theme.of(context).buttonColor,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Center(
-            child: Text(
-              value,
-              style: TextStyle(
-                fontFamily: 'Roboto',
-                fontSize: 25,
-                fontWeight: FontWeight.bold,
-                color: Color(colorValue),
-              ),
-            ),
-          ),
         ),
       ),
     );
